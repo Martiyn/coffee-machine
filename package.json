@@ -1,0 +1,14 @@
+{
+  "name": "practice",
+  "version": "1.0.0",
+  "description": "coffee-machine-program",
+  "main": "bin/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Martiyn",
+  "license": "ISC",
+  "bin": {
+    "coffee": "./bin/index.js"
+  }
+}
