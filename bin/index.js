@@ -17,9 +17,7 @@ async function makeCoffee(){
      console.log(coffee)
      return coffee
     } catch (error) {
-        catchError(error, {
-          prodMsg: "Неуспешно приготвяне на кафе"
-        });
+        console.error(error)
       }
 }
 
