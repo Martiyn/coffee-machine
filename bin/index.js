@@ -4,24 +4,32 @@ const espressoMedium = "espresso-medium"
 const espressoLarge = "espresso-large"
 const capuccino = "capuccino"
 
-async function makeCoffee(type) {
+const yargs = require("yargs");
+
+const options = yargs
+  .usage("Usage: -c <coffee>")
+  .option("c", { alias: "coffee", describe: "Your coffee", type: "string", demandOption: true })
+  .argv;
+
+async function makeCoffee() {
   try {
-    coffee.coffeeType = type
-    if (!coffee.coffeeType){
-      console.log("Please select your coffee")
+    coffee.coffeeType = options.coffee
+    if (coffee.coffeeType === capuccino || coffee.coffeeType === espressoSmall || coffee.coffeeType === espressoMedium || coffee.coffeeType === espressoLarge) {
+      console.log(coffee)
+      const addedMilk = await addMilkToCoffee();
+      console.log(coffee)
+      const addedGrains = await addCoffeeGrainsToCoffee();
+      console.log(coffee)
+      const addedWater = await addWaterToCoffee();
+      console.log(coffee)
+      if (addedMilk && addedGrains && addedWater) {
+        coffee.error = null
+      }
+      console.log(coffee)
+      return coffee
+    } else {
+      console.log("Please select one of the available coffees")
     }
-    console.log(coffee)
-    const addedMilk = await addMilkToCoffee();
-    console.log(coffee)
-    const addedGrains = await addCoffeeGrainsToCoffee();
-    console.log(coffee)
-    const addedWater = await addWaterToCoffee();
-    console.log(coffee)
-    if (addedMilk && addedGrains && addedWater) {
-      coffee.error = null
-    }
-    console.log(coffee)
-    return coffee
   } catch (error) {
     console.error(error)
   }
