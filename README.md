@@ -22,6 +22,6 @@ with all the steps taken for creating the coffee.
 <ul>
 <li>First clone the project using git clone</li>
 <li>Then you will need to install the project using npm i -g</li>
-<li>When the project is all set up, in the command line just type "coffee"</li>
+<li>When the project is all set up, in the command line just type in one of the commands listed above</li>
 <li>The script will start to run and you will see the coffee machine in action</li>
 </ul>
