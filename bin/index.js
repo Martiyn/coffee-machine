@@ -37,95 +37,107 @@ async function makeCoffee() {
 
 
 async function addMilkToCoffee() {
-  if (coffee.coffeeType === espressoSmall) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.milkMl = '0.2ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoMedium) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.milkMl = '0.5ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoLarge) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.milkMl = '0.8ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === capuccino) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.milkMl = '0.4ml');
-      }, 2000);
-    });
+  switch (coffee.coffeeType) {
+    case espressoSmall:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.milkMl = '0.2ml');
+        }, 2000);
+      });
+
+    case espressoMedium:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.milkMl = '0.5ml');
+        }, 2000);
+      });
+
+    case espressoLarge:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.milkMl = '0.8ml');
+        }, 2000);
+      });
+
+    case capuccino:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.milkMl = '0.4ml');
+        }, 2000);
+      });
+
+    default:
+      break;
   }
 }
 
 async function addCoffeeGrainsToCoffee() {
-  if (coffee.coffeeType === espressoSmall) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.coffeeAmt = '5mg');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoMedium) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.coffeeAmt = '7mg');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoLarge) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.coffeeAmt = '10mg');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === capuccino) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.coffeeAmt = '12mg');
-      }, 2000);
-    });
+  switch (coffee.coffeeType) {
+    case espressoSmall:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.coffeeAmt = '5mg');
+        }, 2000);
+      });
+
+    case espressoMedium:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.coffeeAmt = '7mg');
+        }, 2000);
+      });
+
+    case espressoLarge:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.coffeeAmt = '10mg');
+        }, 2000);
+      });
+
+    case capuccino:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.coffeeAmt = '12mg');
+        }, 2000);
+      });
+
+    default:
+      break;
   }
 }
 
 async function addWaterToCoffee() {
-  if (coffee.coffeeType === espressoSmall) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.waterMl = '0.5ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoMedium) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.waterMl = '0.7ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === espressoLarge) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.waterMl = '1ml');
-      }, 2000);
-    });
-  }
-  if (coffee.coffeeType === capuccino) {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(coffee.waterMl = '0.9ml');
-      }, 2000);
-    });
+  switch (coffee.coffeeType) {
+    case espressoSmall:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.waterMl = '0.5ml');
+        }, 2000);
+      });
+
+    case espressoMedium:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.waterMl = '0.7ml');
+        }, 2000);
+      });
+
+    case espressoLarge:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.waterMl = '1ml');
+        }, 2000);
+      });
+
+    case capuccino:
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(coffee.waterMl = '0.9ml');
+        }, 2000);
+      });
+
+    default:
+      break;
   }
 }
 
