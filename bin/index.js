@@ -1,9 +1,12 @@
-let coffee = new Object()
-const espressoSmall = "espresso-small"
-const espressoMedium = "espresso-medium"
-const espressoLarge = "espresso-large"
-const capuccino = "capuccino"
+let coffee = new Object();
 
+let coffeeOptions = new Map([
+  ['espresso-small'],
+  ['espresso-medium'],
+  ['espresso-large'],
+  ['capuccino']
+])
+const timeOutTime = 2000;
 const yargs = require("yargs");
 
 const options = yargs
@@ -13,8 +16,8 @@ const options = yargs
 
 async function makeCoffee() {
   try {
-    coffee.coffeeType = options.coffee
-    if (coffee.coffeeType === capuccino || coffee.coffeeType === espressoSmall || coffee.coffeeType === espressoMedium || coffee.coffeeType === espressoLarge) {
+    Object.assign(coffee, { coffeeType: options.coffee })
+    if (coffeeOptions.has(coffee.coffeeType)) {
       console.log(coffee)
       const addedMilk = await addMilkToCoffee();
       console.log(coffee)
@@ -23,7 +26,7 @@ async function makeCoffee() {
       const addedWater = await addWaterToCoffee();
       console.log(coffee)
       if (addedMilk && addedGrains && addedWater) {
-        coffee.error = null
+        Object.assign(coffee, { error: null })
       }
       console.log(coffee)
       return coffee
@@ -38,107 +41,86 @@ async function makeCoffee() {
 
 async function addMilkToCoffee() {
   switch (coffee.coffeeType) {
-    case espressoSmall:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.milkMl = '0.2ml');
-        }, 2000);
-      });
+    case "espresso-small":
+      Object.assign(coffee, { milkMl: '0.2ml' })
+      break;
 
-    case espressoMedium:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.milkMl = '0.5ml');
-        }, 2000);
-      });
+    case "espresso-medium":
+      Object.assign(coffee, { milkMl: '0.5ml' })
+      break;
 
-    case espressoLarge:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.milkMl = '0.8ml');
-        }, 2000);
-      });
+    case "espresso-large":
+      Object.assign(coffee, { milkMl: '0.8ml' })
+      break;
 
-    case capuccino:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.milkMl = '0.4ml');
-        }, 2000);
-      });
+    case "capuccino":
+      Object.assign(coffee, { milkMl: '0.7ml' })
+      break;
 
     default:
       break;
   }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(coffee.milkMl);
+    }, timeOutTime);
+  });
 }
 
 async function addCoffeeGrainsToCoffee() {
   switch (coffee.coffeeType) {
-    case espressoSmall:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.coffeeAmt = '5mg');
-        }, 2000);
-      });
+    case 'espresso-small':
+      Object.assign(coffee, { coffeeAmt: '5mg' })
+      break;
 
-    case espressoMedium:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.coffeeAmt = '7mg');
-        }, 2000);
-      });
+    case 'espresso-medium':
+      Object.assign(coffee, { coffeeAmt: '7mg' })
+      break;
 
-    case espressoLarge:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.coffeeAmt = '10mg');
-        }, 2000);
-      });
+    case 'espresso-large':
+      Object.assign(coffee, { coffeeAmt: '10mg' })
+      break;
 
-    case capuccino:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.coffeeAmt = '12mg');
-        }, 2000);
-      });
+    case 'capuccino':
+      Object.assign(coffee, { coffeeAmt: '9mg' })
+      break;
 
     default:
       break;
   }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(coffee.coffeeAmt);
+    }, timeOutTime);
+  });
 }
 
 async function addWaterToCoffee() {
   switch (coffee.coffeeType) {
-    case espressoSmall:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.waterMl = '0.5ml');
-        }, 2000);
-      });
+    case 'espresso-small':
+      Object.assign(coffee, { waterMl: '0.5ml' })
+      break;
 
-    case espressoMedium:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.waterMl = '0.7ml');
-        }, 2000);
-      });
+    case 'espresso-medium':
+      Object.assign(coffee, { waterMl: '0.7ml' })
+      break;
 
-    case espressoLarge:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.waterMl = '1ml');
-        }, 2000);
-      });
+    case 'espresso-large':
+      Object.assign(coffee, { waterMl: '1ml' })
+      break;
 
-    case capuccino:
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(coffee.waterMl = '0.9ml');
-        }, 2000);
-      });
+    case 'capuccino':
+      Object.assign(coffee, { waterMl: '0.9ml' })
+      break;
 
     default:
       break;
   }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(coffee.waterMl);
+    }, timeOutTime);
+  });
 }
 
 makeCoffee()
