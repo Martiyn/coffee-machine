@@ -1,12 +1,25 @@
 let coffee = new Object();
 
 let coffeeOptions = new Map([
-  ['espresso-small'],
-  ['espresso-medium'],
-  ['espresso-large'],
-  ['capuccino']
+  ['espresso-small',
+    { grindTime: 5, grindFineness: 'semi-fine', temperature: 200, milkMl: 5, grainsGr: 2, waterMl: 4 }],
+  ['espresso-medium',
+    { grindTime: 4, grindFineness: 'fine', temperature: 220, milkMl: 3, grainsGr: 4, waterMl: 5 }],
+  ['espresso-large',
+    { grindTime: 6, grindFineness: 'wholeground', temperature: 250, milkMl: 6, grainsGr: 7, waterMl: 6 }],
+  ['capuccino',
+    { grindTime: 3, grindFineness: 'ground', temperature: 190, milkMl: 4, grainsGr: 3, waterMl: 4 }]
 ])
+const units = {
+  seconds: 'seconds',
+  temperature: 'degrees celsius',
+  miliLiters: 'Ml'
+}
 const timeOutTime = 2000;
+const defaultGrinderSettings = {
+  time: 20,
+  fineness: 'fine'
+}
 const yargs = require("yargs");
 
 const options = yargs
@@ -38,89 +51,126 @@ async function makeCoffee() {
   }
 }
 
-
 async function addMilkToCoffee() {
-  switch (coffee.coffeeType) {
-    case "espresso-small":
-      Object.assign(coffee, { milkMl: '0.2ml' })
-      break;
-
-    case "espresso-medium":
-      Object.assign(coffee, { milkMl: '0.5ml' })
-      break;
-
-    case "espresso-large":
-      Object.assign(coffee, { milkMl: '0.8ml' })
-      break;
-
-    case "capuccino":
-      Object.assign(coffee, { milkMl: '0.7ml' })
-      break;
-
-    default:
-      break;
-  }
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(coffee.milkMl);
-    }, timeOutTime);
-  });
+  let milk = coffeeOptions.get(coffee.coffeeType)
+  Object.assign(coffee, { milkMl: milk.milkMl })
+  const process = await timeRequired(coffee.milkMl)
+  return process
 }
 
 async function addCoffeeGrainsToCoffee() {
-  switch (coffee.coffeeType) {
-    case 'espresso-small':
-      Object.assign(coffee, { coffeeAmt: '5mg' })
-      break;
-
-    case 'espresso-medium':
-      Object.assign(coffee, { coffeeAmt: '7mg' })
-      break;
-
-    case 'espresso-large':
-      Object.assign(coffee, { coffeeAmt: '10mg' })
-      break;
-
-    case 'capuccino':
-      Object.assign(coffee, { coffeeAmt: '9mg' })
-      break;
-
-    default:
-      break;
-  }
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(coffee.coffeeAmt);
-    }, timeOutTime);
-  });
+  let grains = coffeeOptions.get(coffee.coffeeType)
+  Object.assign(coffee, { grainsGr: grains.grainsGr })
+  const process = await timeRequired(coffee.grainsGr)
+  return process
 }
 
 async function addWaterToCoffee() {
-  switch (coffee.coffeeType) {
-    case 'espresso-small':
-      Object.assign(coffee, { waterMl: '0.5ml' })
-      break;
+  let water = coffeeOptions.get(coffee.coffeeType)
+  Object.assign(coffee, { waterMl: water.waterMl })
+  const process = await timeRequired(coffee.waterMl)
+  return process
+}
 
-    case 'espresso-medium':
-      Object.assign(coffee, { waterMl: '0.7ml' })
-      break;
-
-    case 'espresso-large':
-      Object.assign(coffee, { waterMl: '1ml' })
-      break;
-
-    case 'capuccino':
-      Object.assign(coffee, { waterMl: '0.9ml' })
-      break;
-
-    default:
-      break;
-  }
+async function timeRequired(task) {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(coffee.waterMl);
+      resolve(task);
     }, timeOutTime);
   });
 }
 
 makeCoffee()
+
+//'-----------------------------------------CLASSES----------------------------------------------------------'
+// GRINDER CLASS
+class Grinder {
+  constructor(time, fineness) {
+    this.time = time
+    this.timeUnit = units.seconds
+    this.fineness = fineness
+  }
+  grind() {
+    return ('${this.time},${this.timeUnit},${this.fineness}')
+  }
+}
+
+let grinder = new Grinder(defaultGrinderSettings.time, defaultGrinderSettings.fineness)
+
+console.log(grinder)
+
+// RESERVOIRE CLASS
+class Reservoire {
+  constructor(passAmount) {
+    this.passAmount = passAmount
+  }
+  passToHeater() {
+    return ('${this.passAmount}')
+  }
+}
+
+class WaterReservoire extends Reservoire {
+  constructor(passAmount, liquid) {
+    super(passAmount)
+    this.waterUnit = units.miliLiters
+    this.liquid = liquid
+  }
+  passToHeater() {
+    return ('${super.passToHeater},${this.waterUnit},${this.liquid}')
+  }
+}
+
+class MilkReservoire extends Reservoire {
+  constructor(passAmount, liquid) {
+    super(passAmount)
+    this.milkUnit = units.miliLiters
+    this.liquid = liquid
+  }
+  passToHeater() {
+    return ('${super.passToHeater},${this.milkUnit},${this.liquid}')
+  }
+}
+
+let milkRes = new MilkReservoire(1, 'milk')
+let waterRes = new WaterReservoire(2, 'water')
+
+console.log(milkRes)
+console.log(waterRes)
+
+// HEATER CLASS
+class Heater {
+  constructor(liquid) {
+    this.liquid = liquid
+  }
+  heatUpLiquid() {
+    return ('${this.liquid}')
+  }
+}
+
+class WaterHeater extends Heater {
+  constructor(liquid, temperature) {
+    super(liquid)
+    this.temperature = temperature
+    this.temperatureUnit = units.temperature
+  }
+  heatUpLiquid() {
+    return ('${super.heatUpLiquid},${temperature},${this.temperatureUnit}')
+  }
+}
+
+class MilkHeater extends Heater {
+  constructor(liquid, temperature) {
+    super(liquid)
+    this.temperature = temperature
+    this.temperatureUnit = units.temperature
+  }
+  heatUpLiquid() {
+    return ('${super.heatUpLiquid},${temperature},${this.temperatureUnit}')
+  }
+}
+
+let waterHot = new WaterHeater('water', 500)
+let milkHot = new MilkHeater('milk', 700)
+
+console.log(waterHot)
+console.log(milkHot)
