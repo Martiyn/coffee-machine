@@ -43,7 +43,7 @@ class GrainGrinder {
     this.fineness = fineness
   }
   grind() {
-    return ('${this.time},${this.timeUnit},${this.amount},${this.amountUnit},${this.fineness}')
+    return (`${this.time},${this.timeUnit},${this.amount},${this.amountUnit},${this.fineness}`)
   }
 }
 
@@ -53,7 +53,7 @@ class Reservoire {
     this.liquid = liquid
   }
   passToHeater() {
-    return ('${this.liquid}')
+    return (`${this.liquid}`)
   }
 }
 
@@ -64,7 +64,7 @@ class WaterReservoire extends Reservoire {
     this.amountUnit = units.miliLiters
   }
   passToHeater() {
-    return ('${super.passToHeater},${this.passAmount},${this.waterUnit}')
+    return (`${super.passToHeater},${this.passAmount},${this.waterUnit}`)
   }
 }
 
@@ -75,7 +75,7 @@ class MilkReservoire extends Reservoire {
     this.amountUnit = units.miliLiters
   }
   passToHeater() {
-    return ('${super.passToHeater},${this.passAmount},${this.milkUnit}')
+    return (`${super.passToHeater},${this.passAmount},${this.milkUnit}`)
   }
 }
 
@@ -85,7 +85,7 @@ class Heater {
     this.liquid = liquid
   }
   heatUpLiquid() {
-    return ('${this.liquid}')
+    return (`${this.liquid}`)
   }
 }
 
@@ -98,7 +98,7 @@ class WaterHeater extends Heater {
     this.temperatureUnit = units.temperature
   }
   heatUpLiquid() {
-    return ('${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}')
+    return (`${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}`)
   }
 }
 
@@ -111,7 +111,7 @@ class MilkHeater extends Heater {
     this.temperatureUnit = units.temperature
   }
   heatUpLiquid() {
-    return ('${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}')
+    return (`${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}`)
   }
 }
 
@@ -155,20 +155,17 @@ async function makeCoffee() {
 }
 
 async function addMilkToCoffee(value) {
-  Object.assign(coffee, { milk: value.milk })
-  Object.assign(coffee, { milkUnit: value.milkUnit })
+  Object.assign(coffee, { milk: value.milk }, { milkUnit: value.milkUnit })
   return await timeRequired(coffee.milk, coffee.milkUnit)
 }
 
 async function addCoffeeGrainsToCoffee(value) {
-  Object.assign(coffee, { grains: value.grains })
-  Object.assign(coffee, { grainsUnit: value.grainsUnit })
+  Object.assign(coffee, { grains: value.grains }, { grainsUnit: value.grainsUnit })
   return await timeRequired(coffee.grains, coffee.grainsUnit)
 }
 
 async function addWaterToCoffee(value) {
-  Object.assign(coffee, { water: value.water })
-  Object.assign(coffee, { waterUnit: value.waterUnit })
+  Object.assign(coffee, { water: value.water }, { waterUnit: value.waterUnit })
   return await timeRequired(coffee.water, coffee.waterUnit)
 }
 
