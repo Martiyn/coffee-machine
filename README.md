@@ -9,7 +9,7 @@ with all the steps taken for creating the coffee.
 </p>
 
 <h1>Usage:</h1>
-<p>In the command line you need to pick whichever coffee you like out of the available</p>
+<p>In the command line you need to pick whichever coffee you like out of the available:</p>
 <ul>
 <li>Short espresso: coffee -c espresso-small</li>
 <li>Medium espresso: coffee -c espresso-medium</li>
@@ -17,6 +17,27 @@ with all the steps taken for creating the coffee.
 <li>Capuccino: coffee -c capuccino</li>
 </ul>
 <p>NOTE: If you attempt to select an option different from the ones listed above, you will be asked to select an available coffee type!</p>
+
+<p>You can also select the amount of milk that your coffee can have by placing it as the second argument:</p>
+<ul>
+<li>Short espresso: coffee -c espresso-small -m default-milk</li>
+<li>Short espresso: coffee -c espresso-small -m double-milk</li>
+<li>Short espresso: coffee -c espresso-small -m no-milk</li>
+</ul>
+<p>NOTE: The default milk setting stands for the milk setting that each individual coffee type has set up by default! 
+SIDENOTE: This option is completely optional, if you select only the coffee type your coffee will be made!
+</p>
+
+<p>You can also select the amount of sugar that your coffee can have by placing it as the third argument:</p>
+<ul>
+<li>Short espresso: coffee -c espresso-small -m default-milk -s with-sugar</li>
+<li>Short espresso: coffee -c espresso-small -m default-milk -s medium-sugar</li>
+<li>Short espresso: coffee -c espresso-small -m default-milk -s little-sugar</li>
+<li>Short espresso: coffee -c espresso-small -m default-milk -s no-sugar</li>
+</ul>
+<p>NOTE: The default setting for all coffee types is "No Sugar"!
+SIDENOTE: This option is completely optional, if you select only the coffee type your coffee will be made!
+</p>
 
 <h2>This project is a command line application:</h2>
 <ul>
