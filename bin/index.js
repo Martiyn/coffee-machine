@@ -9,15 +9,24 @@ const units = {
   water: 'Water'
 }
 
+const sugarOptions = new Map([
+  ['with-sugar', 5],
+  ['medium-sugar', 3],
+  ['little-sugar', 1],
+  ['no-sugar', 'No Sugar'],
+])
+
+const defaultSugarOption = sugarOptions.get('no-sugar')
+
 const coffeeOptions = new Map([
   ['espresso-small',
-    { grindTime: 5, grindFineness: 'semi-fine', milkTemperature: 250, waterTemperature: 200, milk: 5, milkUnit: units.miliLiters, grains: 2, grainsUnit: units.miliGrams, water: 4, waterUnit: units.miliLiters }],
+    { grindTime: 5, grindFineness: 'semi-fine', milkTemperature: 250, waterTemperature: 200, milk: 5, milkUnit: units.miliLiters, grains: 2, grainsUnit: units.miliGrams, water: 4, waterUnit: units.miliLiters, sugar: defaultSugarOption, sugarUnit: units.miliGrams }],
   ['espresso-medium',
-    { grindTime: 4, grindFineness: 'fine', milkTemperature: 270, waterTemperature: 220, milk: 3, milkUnit: units.miliLiters, grains: 4, grainsUnit: units.miliGrams, water: 5, waterUnit: units.miliLiters }],
+    { grindTime: 4, grindFineness: 'fine', milkTemperature: 270, waterTemperature: 220, milk: 3, milkUnit: units.miliLiters, grains: 4, grainsUnit: units.miliGrams, water: 5, waterUnit: units.miliLiters, sugar: defaultSugarOption, sugarUnit: units.miliGrams }],
   ['espresso-large',
-    { grindTime: 6, grindFineness: 'wholeground', milkTemperature: 300, waterTemperature: 250, milk: 6, milkUnit: units.miliLiters, grains: 7, grainsUnit: units.miliGrams, water: 6, waterUnit: units.miliLiters }],
+    { grindTime: 6, grindFineness: 'wholeground', milkTemperature: 300, waterTemperature: 250, milk: 6, milkUnit: units.miliLiters, grains: 7, grainsUnit: units.miliGrams, water: 6, waterUnit: units.miliLiters, sugar: defaultSugarOption, sugarUnit: units.miliGrams }],
   ['capuccino',
-    { grindTime: 3, grindFineness: 'ground', milkTemperature: 240, waterTemperature: 190, milk: 4, milkUnit: units.miliLiters, grains: 3, grainsUnit: units.miliGrams, water: 4, waterUnit: units.miliLiters }]
+    { grindTime: 3, grindFineness: 'ground', milkTemperature: 240, waterTemperature: 190, milk: 4, milkUnit: units.miliLiters, grains: 3, grainsUnit: units.miliGrams, water: 4, waterUnit: units.miliLiters, sugar: defaultSugarOption, sugarUnit: units.miliGrams }]
 ])
 
 const timeOutTime = 2000;
@@ -30,8 +39,20 @@ const yargs = require("yargs");
 
 const options = yargs
   .usage("Usage: -c <coffee>")
-  .option("c", { alias: "coffee", describe: "Your coffee", type: "string", demandOption: false })
+  .option("c", { alias: "coffee", describe: "Select coffee type", type: "string", demandOption: false })
+  .usage("Usage: -m <milk>")
+  .option("m", { alias: "milk", describe: "Select milk amount", type: "string", demandOption: false })
+  .usage("Usage: -s <sugar>")
+  .option("s", { alias: "sugar", describe: "Select sugar amount", type: "string", demandOption: false })
   .argv;
+
+const milkValue = coffeeOptions.get(options.coffee)
+
+const milkOptions = new Map([
+  ['default-milk', milkValue.milk],
+  ['double-milk', milkValue.milk * 2],
+  ['no-milk', 'No Milk']
+])
 
 // GRINDER CLASS
 class GrainGrinder {
@@ -127,12 +148,14 @@ async function makeCoffee() {
       const initializationValues = coffeeOptions.get(coffee.coffeeType)
       const grind = new GrainGrinder(initializationValues.grindTime, initializationValues.grains, initializationValues.grindFineness)
       console.log(grind)
-      const passMilk = new MilkReservoire(units.milk, initializationValues.milk)
-      console.log(passMilk)
+      if (options.milk !== 'no-milk') {
+        const passMilk = new MilkReservoire(units.milk, initializationValues.milk)
+        console.log(passMilk)
+        let heatUpMilk = new MilkHeater(units.milk, initializationValues.milk, initializationValues.milkTemperature)
+        console.log(heatUpMilk)
+      }
       const passWater = new WaterReservoire(units.water, initializationValues.water)
       console.log(passWater)
-      let heatUpMilk = new MilkHeater(units.milk, initializationValues.milk, initializationValues.milkTemperature)
-      console.log(heatUpMilk)
       let heatUpWater = new WaterHeater(units.water, initializationValues.milk, initializationValues.waterTemperature)
       console.log(heatUpWater)
       const addedMilk = await addMilkToCoffee(initializationValues);
@@ -141,7 +164,9 @@ async function makeCoffee() {
       console.log(coffee)
       const addedWater = await addWaterToCoffee(initializationValues);
       console.log(coffee)
-      if (addedMilk && addedGrains && addedWater) {
+      const addedSugar = await addSugarToCoffee(initializationValues);
+      console.log(coffee)
+      if (addedMilk && addedGrains && addedWater && addedSugar) {
         Object.assign(coffee, { error: null })
       }
       console.log(coffee)
@@ -155,7 +180,12 @@ async function makeCoffee() {
 }
 
 async function addMilkToCoffee(value) {
-  Object.assign(coffee, { milk: value.milk }, { milkUnit: value.milkUnit })
+  if (milkOptions.has(options.milk)) {
+    const selectedAmount = milkOptions.get(options.milk)
+    Object.assign(coffee, { milk: selectedAmount }, { milkUnit: value.milkUnit })
+  } else {
+    Object.assign(coffee, { milk: value.milk }, { milkUnit: value.milkUnit })
+  }
   return await timeRequired(coffee.milk, coffee.milkUnit)
 }
 
@@ -167,6 +197,16 @@ async function addCoffeeGrainsToCoffee(value) {
 async function addWaterToCoffee(value) {
   Object.assign(coffee, { water: value.water }, { waterUnit: value.waterUnit })
   return await timeRequired(coffee.water, coffee.waterUnit)
+}
+
+async function addSugarToCoffee(value) {
+  if (sugarOptions.has(options.sugar)) {
+    const selectedAmount = sugarOptions.get(options.sugar)
+    Object.assign(coffee, { sugar: selectedAmount }, { sugarUnit: value.sugarUnit })
+  } else {
+    Object.assign(coffee, { sugar: value.sugar }, { sugarUnit: value.sugarUnit })
+  }
+  return await timeRequired(coffee.sugar, coffee.sugarUnit)
 }
 
 async function timeRequired(task, unit) {
