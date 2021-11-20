@@ -24,7 +24,7 @@ with all the steps taken for creating the coffee.
 <li>Short espresso: coffee -c espresso-small -m double-milk</li>
 <li>Short espresso: coffee -c espresso-small -m no-milk</li>
 </ul>
-<p>NOTE: The default milk setting stands for the milk setting that each individual coffee type has set up by default! 
+<p>NOTE: The  with-milk setting stands for the milk setting that each individual coffee type has set up by default! 
 SIDENOTE: This option is completely optional, if you select only the coffee type your coffee will be made!
 </p>
 
