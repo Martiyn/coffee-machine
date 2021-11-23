@@ -138,85 +138,89 @@ const defaultGrinderSettings = {
   fineness: 'fine'
 }
 
-// GRINDER CLASS
-class GrainGrinder {
-  constructor(time, amount, fineness) {
-    this.time = time
-    this.timeUnit = units.seconds
+const defaultLiquidTemperature = {
+  milk: 25,
+  water: 23
+}
+
+// GRAIN MANAGEMENT CLASSES
+class Grains {
+  constructor(amount) {
     this.amount = amount
     this.amountUnit = units.miliGrams
-    this.fineness = fineness
+    this.preGrindFineness = 'Whole'
+  }
+}
+
+class GrainGrinder {
+  constructor(material, timeToGrind, grindToFineness) {
+    this.material = material
+    this.timeToGrind = timeToGrind
+    this.timeUnit = units.seconds
+    this.grindToFineness = grindToFineness
   }
   grind() {
-    return (`${this.time},${this.timeUnit},${this.amount},${this.amountUnit},${this.fineness}`)
+    return this.material, this.timeToGrind, this.timeUnit, this.grindToFineness
   }
 }
 
-// RESERVOIRE CLASS
-class Reservoire {
+//MILK MANAGEMENT CLASSES
+class Milk {
+  constructor(amount) {
+    this.amount = amount
+    this.amountUnit = units.miliLiters
+    this.preHeatTemperature = defaultLiquidTemperature.milk
+    this.temperatureUnit = units.temperature
+  }
+}
+
+class MilkReservoire {
   constructor(liquid) {
     this.liquid = liquid
   }
   passToHeater() {
-    return (`${this.liquid}`)
+    return this.liquid
   }
 }
 
-class WaterReservoire extends Reservoire {
-  constructor(liquid, passAmount) {
-    super(liquid)
-    this.passAmount = passAmount
+class MilkHeater {
+  constructor(liquidPassedFrom, heatToTemperature) {
+    this.liquidPassedFrom = liquidPassedFrom
+    this.heatToTemperature = heatToTemperature
+    this.temperatureUnit = units.temperature
+  }
+  heatUpLiquid() {
+    return this.liquidPassedFrom, this.temperature, this.temperatureUnit
+  }
+}
+
+//WATER MANAGEMENT CLASSES
+class Water {
+  constructor(amount) {
+    this.amount = amount
     this.amountUnit = units.miliLiters
-  }
-  passToHeater() {
-    return (`${super.passToHeater},${this.passAmount},${this.waterUnit}`)
-  }
-}
-
-class MilkReservoire extends Reservoire {
-  constructor(liquid, passAmount) {
-    super(liquid)
-    this.passAmount = passAmount
-    this.amountUnit = units.miliLiters
-  }
-  passToHeater() {
-    return (`${super.passToHeater},${this.passAmount},${this.milkUnit}`)
+    this.preHeatTemperature = defaultLiquidTemperature.milk
+    this.temperatureUnit = units.temperature
   }
 }
 
-// HEATER CLASS
-class Heater {
+class WaterReservoire {
   constructor(liquid) {
     this.liquid = liquid
   }
-  heatUpLiquid() {
-    return (`${this.liquid}`)
+  passToHeater() {
+    return this.liquid
   }
 }
 
-class WaterHeater extends Heater {
-  constructor(liquid, amount, temperature) {
-    super(liquid)
-    this.amount = amount
-    this.amountUnit = units.miliLiters
-    this.temperature = temperature
+class WaterHeater {
+  constructor(liquidPassedFrom, heatToTemperature) {
+    this.liquidPassedFrom = liquidPassedFrom
+    this.heatToTemperature = heatToTemperature
     this.temperatureUnit = units.temperature
   }
   heatUpLiquid() {
-    return (`${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}`)
-  }
-}
-
-class MilkHeater extends Heater {
-  constructor(liquid, amount, temperature) {
-    super(liquid)
-    this.amount = amount
-    this.amountUnit = units.miliLiters
-    this.temperature = temperature
-    this.temperatureUnit = units.temperature
-  }
-  heatUpLiquid() {
-    return (`${super.heatUpLiquid},${this.amount},${this.amountUnit},${this.temperature},${this.temperatureUnit}`)
+    return this.liquidPassedFrom, this.temperature, this.temperatureUnit
   }
 }
 
@@ -230,21 +234,24 @@ async function makeCoffee() {
     if (coffeeOptions.has(coffee.coffeeType)) {
       console.log(coffee)
       const initializationValues = coffeeOptions.get(coffee.coffeeType)
-      const grind = new GrainGrinder(initializationValues.grindTime, initializationValues.grains, initializationValues.grindFineness)
+      const grains = new Grains(initializationValues.grains)
+      const grind = new GrainGrinder(grains, initializationValues.grindTime, initializationValues.grindFineness)
       const grindComplete = await timeNeededToInitialize(grind)
       console.log(grindComplete)
       if (options.milk !== 'no-milk') {
-        const passMilk = new MilkReservoire(units.milk, initializationValues.milk)
+        const milk = new Milk(initializationValues.milk)
+        const passMilk = new MilkReservoire(milk)
         const passMilkComplete = await timeNeededToInitialize(passMilk)
         console.log(passMilkComplete)
-        const heatUpMilk = new MilkHeater(units.milk, initializationValues.milk, initializationValues.milkTemperature)
+        const heatUpMilk = new MilkHeater(passMilk, initializationValues.milkTemperature)
         const heatUpMilkComplete = await timeNeededToInitialize(heatUpMilk)
         console.log(heatUpMilkComplete)
       }
-      const passWater = new WaterReservoire(units.water, initializationValues.water)
+      const water = new Water(initializationValues.water)
+      const passWater = new WaterReservoire(water)
       const passWaterComplete = await timeNeededToInitialize(passWater)
       console.log(passWaterComplete)
-      const heatUpWater = new WaterHeater(units.water, initializationValues.milk, initializationValues.waterTemperature)
+      const heatUpWater = new WaterHeater(passWater, initializationValues.waterTemperature)
       const heatUpWaterComplete = await timeNeededToInitialize(heatUpWater)
       console.log(heatUpWaterComplete)
       const addedMilk = await addMilkToCoffee(initializationValues);
