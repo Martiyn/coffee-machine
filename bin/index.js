@@ -46,7 +46,7 @@ const units = {
   water: 'Water'
 }
 
-sugarTypeOptions = new Map([
+const sugarTypeOptions = new Map([
   ['white-sugar', 'White Sugar'],
   ['brown-sugar', 'Brown Sugar']
 ])
@@ -60,6 +60,10 @@ const sugarAmountOptions = new Map([
 
 const defaultSugarAmountOption = sugarAmountOptions.get('no-sugar')
 const defaultSugarTypeOption = sugarTypeOptions.get('white-sugar')
+const selectedSugarAmount = sugarAmountOptions.get(options.sugarAmount)
+const validSugarAmountOption = sugarAmountOptions.has(options.sugarAmount) ? selectedSugarAmount : defaultSugarAmountOption
+const selectedSugarType = sugarTypeOptions.get(options.sugarType)
+const validSugarTypeOption = sugarTypeOptions.has(options.sugarType) ? selectedSugarType : defaultSugarTypeOption
 
 const coffeeOptions = new Map([
   ['espresso-small',
@@ -128,6 +132,17 @@ const coffeeOptions = new Map([
     }]
 ])
 
+const initializationValues = coffeeOptions.get(options.coffee)
+
+const milkAmountOptions = new Map([
+  ['with-milk', initializationValues.milk],
+  ['double-milk', initializationValues.milk * 2],
+  ['no-milk', 0]
+])
+
+const selectedMilkAmount = milkAmountOptions.get(options.milk)
+const validMilkAmountOption = milkAmountOptions.has(options.milk) ? selectedMilkAmount : initializationValues.milk
+
 const timeOutTime = {
   initializationTime: 3000,
   addingTime: 2000
@@ -143,220 +158,158 @@ const defaultLiquidTemperature = {
   water: 23
 }
 
-// GRAIN MANAGEMENT CLASSES
+const amountInReservoire = {
+  milk: 200,
+  water: 200,
+  grains: 250,
+  whiteSugar: 150,
+  brownSugar: 150
+}
+
+// GRAIN MANAGEMENT
 class Grains {
   constructor(amount) {
     this.amount = amount
     this.amountUnit = units.miliGrams
-    this.preGrindFineness = 'Whole'
+    this.fineness = 'Whole'
+  }
+}
+
+class GrainsReservoire {
+  constructor(material) {
+    this.totalAmount = amountInReservoire.grains
+    this.material = material
+    this.amountLeft = this.totalAmount - this.material.amount
+    this.amountUnit = units.miliGrams
   }
 }
 
 class GrainGrinder {
-  constructor(material, timeToGrind, grindToFineness) {
-    this.material = material
+  constructor(timeToGrind, material, fineness) {
     this.timeToGrind = timeToGrind
     this.timeUnit = units.seconds
-    this.grindToFineness = grindToFineness
-  }
-  grind() {
-    return this.material, this.timeToGrind, this.timeUnit, this.grindToFineness
+    this.material = material.material
+    this.material.fineness = fineness
   }
 }
 
-//MILK MANAGEMENT CLASSES
+async function addCoffeeGrainsToCoffee(value) {
+  Object.assign(coffee,
+    {
+      grains: value.material.amount,
+      grainsUnit: value.material.amountUnit
+    })
+  return await timeNeededToAdd(coffee.grains, coffee.grainsUnit)
+}
+
+
+//MILK MANAGEMENT
 class Milk {
   constructor(amount) {
     this.amount = amount
     this.amountUnit = units.miliLiters
-    this.preHeatTemperature = defaultLiquidTemperature.milk
+    this.temperature = defaultLiquidTemperature.milk
     this.temperatureUnit = units.temperature
   }
 }
 
 class MilkReservoire {
   constructor(liquid) {
+    this.totalAmount = amountInReservoire.milk
     this.liquid = liquid
-  }
-  passToHeater() {
-    return this.liquid
+    this.amountLeft = this.totalAmount - this.liquid.amount
+    this.amountUnit = units.miliLiters
   }
 }
 
 class MilkHeater {
-  constructor(liquidPassedFrom, heatToTemperature) {
-    this.liquidPassedFrom = liquidPassedFrom
-    this.heatToTemperature = heatToTemperature
-    this.temperatureUnit = units.temperature
-  }
-  heatUpLiquid() {
-    return this.liquidPassedFrom, this.temperature, this.temperatureUnit
+  constructor(liquid, temperature) {
+    this.liquid = liquid.liquid
+    this.liquid.temperature = temperature
   }
 }
 
-//WATER MANAGEMENT CLASSES
+async function addMilkToCoffee(value) {
+  Object.assign(coffee,
+    {
+      milk: value.liquid.amount,
+      milkUnit: value.liquid.amountUnit
+    })
+  return await timeNeededToAdd(coffee.milk, coffee.milkUnit)
+}
+
+//WATER MANAGEMENT
 class Water {
   constructor(amount) {
     this.amount = amount
     this.amountUnit = units.miliLiters
-    this.preHeatTemperature = defaultLiquidTemperature.milk
+    this.temperature = defaultLiquidTemperature.water
     this.temperatureUnit = units.temperature
   }
 }
 
 class WaterReservoire {
   constructor(liquid) {
+    this.totalAmount = amountInReservoire.water
     this.liquid = liquid
-  }
-  passToHeater() {
-    return this.liquid
+    this.amountLeft = this.totalAmount - this.liquid.amount
+    this.amountUnit = units.miliLiters
   }
 }
 
 class WaterHeater {
-  constructor(liquidPassedFrom, heatToTemperature) {
-    this.liquidPassedFrom = liquidPassedFrom
-    this.heatToTemperature = heatToTemperature
-    this.temperatureUnit = units.temperature
+  constructor(liquid, temperature) {
+    this.liquid = liquid.liquid
+    this.liquid.temperature = temperature
   }
-  heatUpLiquid() {
-    return this.liquidPassedFrom, this.temperature, this.temperatureUnit
-  }
-}
-
-async function makeCoffee() {
-  try {
-    Object.assign(coffee, { coffeeType: options.coffee })
-    if (coffee.coffeeType === undefined) {
-      const grindDefault = new GrainGrinder(defaultGrinderSettings.time, defaultGrinderSettings.amount, defaultGrinderSettings.fineness)
-      console.log(grindDefault)
-    }
-    if (coffeeOptions.has(coffee.coffeeType)) {
-      console.log(coffee)
-      const initializationValues = coffeeOptions.get(coffee.coffeeType)
-      const grains = new Grains(initializationValues.grains)
-      const grind = new GrainGrinder(grains, initializationValues.grindTime, initializationValues.grindFineness)
-      const grindComplete = await timeNeededToInitialize(grind)
-      console.log(grindComplete)
-      if (options.milk !== 'no-milk') {
-        const milk = new Milk(initializationValues.milk)
-        const passMilk = new MilkReservoire(milk)
-        const passMilkComplete = await timeNeededToInitialize(passMilk)
-        console.log(passMilkComplete)
-        const heatUpMilk = new MilkHeater(passMilk, initializationValues.milkTemperature)
-        const heatUpMilkComplete = await timeNeededToInitialize(heatUpMilk)
-        console.log(heatUpMilkComplete)
-      }
-      const water = new Water(initializationValues.water)
-      const passWater = new WaterReservoire(water)
-      const passWaterComplete = await timeNeededToInitialize(passWater)
-      console.log(passWaterComplete)
-      const heatUpWater = new WaterHeater(passWater, initializationValues.waterTemperature)
-      const heatUpWaterComplete = await timeNeededToInitialize(heatUpWater)
-      console.log(heatUpWaterComplete)
-      const addedMilk = await addMilkToCoffee(initializationValues);
-      const milkCheck = addedMilk === 0 ? true : true;
-      console.log(coffee)
-      const addedGrains = await addCoffeeGrainsToCoffee(initializationValues);
-      console.log(coffee)
-      const addedWater = await addWaterToCoffee(initializationValues);
-      console.log(coffee)
-      const addedSugar = await addSugarToCoffee(initializationValues);
-      console.log(coffee)
-      const sugarCheck = addedSugar === 0 ? true : true;
-      if (milkCheck && addedGrains && addedWater && sugarCheck) {
-        Object.assign(coffee,
-          {
-            error: null
-          })
-      }
-      console.log(coffee)
-      return coffee
-    } else {
-      console.log("Please select one of the available coffees")
-    }
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-async function addMilkToCoffee(value) {
-  const milkOptions = new Map([
-    ['with-milk', value.milk],
-    ['double-milk', value.milk * 2],
-    ['no-milk', 0]
-  ])
-  if (milkOptions.has(options.milk)) {
-    const selectedAmount = milkOptions.get(options.milk)
-    Object.assign(coffee,
-      {
-        milk: selectedAmount, milkUnit: value.milkUnit
-      })
-  } else {
-    Object.assign(coffee,
-      {
-        milk: value.milk,
-        milkUnit: value.milkUnit
-      })
-  }
-  return await timeNeededToAdd(coffee.milk, coffee.milkUnit)
-}
-
-async function addCoffeeGrainsToCoffee(value) {
-  Object.assign(coffee,
-    {
-      grains: value.grains,
-      grainsUnit: value.grainsUnit
-    })
-  return await timeNeededToAdd(coffee.grains, coffee.grainsUnit)
 }
 
 async function addWaterToCoffee(value) {
   Object.assign(coffee,
     {
-      water: value.water,
-      waterUnit: value.waterUnit
+      water: value.liquid.amount,
+      waterUnit: value.liquid.amountUnit
     })
   return await timeNeededToAdd(coffee.water, coffee.waterUnit)
 }
 
+//SUGAR MANAGEMENT
+class Sugar {
+  constructor(type, amount) {
+    this.type = type
+    this.amount = amount
+    this.amountUnit = units.miliGrams
+  }
+}
+
+class WhiteSugarReservoire {
+  constructor(material) {
+    this.totalAmount = amountInReservoire.whiteSugar
+    this.material = material
+    this.amountLeft = this.totalAmount - this.material.amount
+    this.amountUnit = units.miliGrams
+  }
+}
+class BrownSugarReservoire {
+  constructor(material) {
+    this.totalAmount = amountInReservoire.brownSugar
+    this.material = material
+    this.amountLeft = this.totalAmount - this.material.amount
+    this.amountUnit = units.miliGrams
+  }
+}
+
 async function addSugarToCoffee(value) {
-  if (sugarAmountOptions.has(options.sugarAmount)) {
-    const selectedAmount = sugarAmountOptions.get(options.sugarAmount)
-    Object.assign(coffee,
-      {
-        sugar: selectedAmount,
-        sugarUnit: value.sugarUnit
-      })
-  } else {
-    Object.assign(coffee,
-      {
-        sugar: value.sugar,
-        sugarUnit: value.sugarUnit
-      })
-  }
-  if (coffee.sugar !== 0) {
-    if (sugarTypeOptions.has(options.sugarType)) {
-      const selectedType = sugarTypeOptions.get(options.sugarType)
-      Object.assign(coffee,
-        {
-          sugarType: selectedType
-        })
-    } else {
-      Object.assign(coffee,
-        {
-          sugarType: value.sugarType
-        })
-    }
-  } else {
-    Object.assign(coffee,
-      {
-        sugarType: 'No Sugar'
-      })
-  }
+  Object.assign(coffee,
+    {
+      sugar: value.material.amount,
+      sugarUnit: value.material.amountUnit,
+      type: value.material.type
+    })
   return await timeNeededToAdd(coffee.sugar, coffee.sugarUnit)
 }
 
+//TIME MANAGEMENT
 async function timeNeededToAdd(task, unit) {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -371,6 +324,95 @@ async function timeNeededToInitialize(task) {
       resolve(task);
     }, timeOutTime.initializationTime);
   });
+}
+
+async function makeCoffee() {
+  try {
+    Object.assign(coffee, { coffeeType: options.coffee })
+    if (coffee.coffeeType === undefined) {
+      const grindDefault = new GrainGrinder(defaultGrinderSettings.time, defaultGrinderSettings.amount, defaultGrinderSettings.fineness)
+      console.log(grindDefault)
+    }
+    if (coffeeOptions.has(coffee.coffeeType)) {
+      console.log(coffee)
+
+      //ADDING THE GRAINS TO THE COFFEE
+      const grains = new Grains(initializationValues.grains)
+      const passGrains = new GrainsReservoire(grains)
+      const passGrainsComplete = await timeNeededToInitialize(passGrains)
+      console.log(passGrainsComplete)
+      const grind = new GrainGrinder(initializationValues.grindTime, passGrains, initializationValues.grindFineness)
+      const grindComplete = await timeNeededToInitialize(grind)
+      console.log(grindComplete)
+      const addedGrains = await addCoffeeGrainsToCoffee(grindComplete);
+      console.log(coffee)
+      console.log('Successfully added grains to coffee')
+
+      //ADDING THE MILK TO THE COFFEE
+      const milk = new Milk(validMilkAmountOption)
+      let addedMilk;
+      if (options.milk !== 'no-milk') {
+        const passMilk = new MilkReservoire(milk)
+        const passMilkComplete = await timeNeededToInitialize(passMilk)
+        console.log(passMilkComplete)
+        const heatUpMilk = new MilkHeater(passMilk, initializationValues.milkTemperature)
+        const heatUpMilkComplete = await timeNeededToInitialize(heatUpMilk)
+        console.log(heatUpMilkComplete)
+        addedMilk = await addMilkToCoffee(heatUpMilkComplete);
+        console.log(coffee)
+        console.log('Successfully added milk to coffee')
+      }
+      const noMilkCheck = addedMilk === undefined || 0 ? true : true;
+
+      //ADDING THE WATER TO THE COFFEE
+      const water = new Water(initializationValues.water)
+      const passWater = new WaterReservoire(water)
+      const passWaterComplete = await timeNeededToInitialize(passWater)
+      console.log(passWaterComplete)
+      const heatUpWater = new WaterHeater(passWater, initializationValues.waterTemperature)
+      const heatUpWaterComplete = await timeNeededToInitialize(heatUpWater)
+      console.log(heatUpWaterComplete)
+      const addedWater = await addWaterToCoffee(heatUpWaterComplete);
+      console.log(coffee)
+      console.log('Successfully added water to coffee')
+
+      //ADDING THE SUGAR TO THE COFFEE
+      const sugar = new Sugar(validSugarTypeOption, validSugarAmountOption)
+      let passSugarComplete;
+      let addedSugar;
+      if (sugar.amount !== 0) {
+        switch (sugar.type) {
+          case 'White Sugar':
+            const passWhiteSugar = new WhiteSugarReservoire(sugar)
+            passSugarComplete = await timeNeededToInitialize(passWhiteSugar)
+            console.log(passSugarComplete)
+            break;
+          case 'Brown Sugar':
+            const passBrownSugar = new BrownSugarReservoire(sugar)
+            passSugarComplete = await timeNeededToInitialize(passBrownSugar)
+            console.log(passSugarComplete)
+        }
+        addedSugar = await addSugarToCoffee(passSugarComplete)
+        console.log(coffee)
+        console.log('Successfully added sugar to coffee')
+      }
+      const noSugarCheck = addedSugar === undefined || 0 ? true : true;
+
+      //DID EVERYTHING SUCCEED
+      if (addedMilk || noMilkCheck && addedGrains && addedWater && addedSugar || noSugarCheck) {
+        Object.assign(coffee,
+          {
+            error: null
+          })
+      }
+      console.log(coffee)
+      return coffee
+    } else {
+      console.log("Please select one of the available coffees")
+    }
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 makeCoffee()
