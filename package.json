@@ -12,6 +12,6 @@
     "coffee": "./bin/index.js"
   },
   "dependencies": {
-    "yargs": "^13.2.4"
+    "inquirer": "^8.2.0"
   }
 }
