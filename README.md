@@ -9,14 +9,7 @@ with all the steps taken for creating the coffee.
 </p>
 
 <h1>Usage:</h1>
-<p>In the command line you need to pick whichever coffee you like out of the available</p>
-<ul>
-<li>Short espresso: coffee -c espresso-small</li>
-<li>Medium espresso: coffee -c espresso-medium</li>
-<li>Large espresso: coffee -c espresso-large</li>
-<li>Capuccino: coffee -c capuccino</li>
-</ul>
-<p>NOTE: If you attempt to select an option different from the ones listed above, you will be asked to select an available coffee type!</p>
+<p>In the command line, just type in "coffee" and you will be prompted to select your coffee type, amount of milk, amount of sugar and type of sugar. Once you do that the coffee machine will make your desired coffee.</p>
 
 <h2>This project is a command line application:</h2>
 <ul>
